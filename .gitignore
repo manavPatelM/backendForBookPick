@@ -1,0 +1,19 @@
+.env
+node_modules/
+dist/
+build/
+
+.vscode/
+.DS_Store
+npm/
+yarn.lock
+.env.local
+.env.development
+.env.production
+.idea/
+*.log
+
+# Expo
+.expo/
+.expo-shared/ 
+web-build/
