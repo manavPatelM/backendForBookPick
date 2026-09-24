@@ -24,7 +24,7 @@ router.post("/", authMiddleware, async (req, res) => {
     await newBook.save();
     res.status(201).json(newBook);
 
-  } } catch (error) {
+  } catch (error) {
     console.error("Error creating book:", error); 
     res.status(500).json({ message: "Server error" });
   }
