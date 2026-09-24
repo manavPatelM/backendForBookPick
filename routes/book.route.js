@@ -5,7 +5,7 @@ import Book from "../models/Book.js";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, async (requestAnimationFrame, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const { title, caption, rating, coverImage } = req.body;
 
@@ -24,8 +24,9 @@ router.post("/", authMiddleware, async (requestAnimationFrame, res) => {
     await newBook.save();
     res.status(201).json(newBook);
 
-  } catch (error) {
-    
+  } } catch (error) {
+    console.error("Error creating book:", error); 
+    res.status(500).json({ message: "Server error" });
   }
 })
 
@@ -34,28 +35,30 @@ router.get("/", authMiddleware, async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
-
-    const books = await Book.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
+    const books = await Book.find()   
       .skip(skip)
       .limit(limit)
       .populate("user", "userName profileImage");
-
     const totalBooks = await Book.countDocuments();
     const totalPages = Math.ceil(totalBooks / limit);
-
-    res.status(200).json({
-      books,
-      pagination: {
-        totalBooks, 
-        totalPages,
-        currentPage: page,
-      },
-    });
+    res.status(200).json({ books, pagination: { totalBooks, totalPages, currentPage: page } });
   } catch (error) {
-    
+    console.error("Error fetching books:", error);         
+    res.status(500).json({ message: "Server error" });
   }
-})
+});
+
+router.get("/user/:userId", authMiddleware, async (req, res) => {
+  try {
+    const books = await Book.find({ user: req.params.userId })
+      .sort({ createdAt: -1 })
+      .populate("user", "userName profileImage");
+    res.status(200).json({ books });
+  } catch (error) {
+    console.error("Error fetching user books:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 router.delete("/:id", authMiddleware, async (req, res) => {
   try {
